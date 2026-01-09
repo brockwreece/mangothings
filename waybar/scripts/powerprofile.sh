@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Get supported powerctl
 if command -v powerprofilesctl &>/dev/null; then
   powerctl="powerprofilesctl"
 elif command -v asusctl &>/dev/null; then
@@ -11,17 +10,21 @@ fi
 
 # Get current power profile
 get_current_profile() {
-  if command -v powerprofilesctl &>/dev/null; then
+  case "$powerctl" in
+  "powerprofilesctl")
     powerprofilesctl get
-  elif command -v asusctl &>/dev/null; then
+    ;;
+  "asusctl")
     local current_mode=$(asusctl profile -p | awk '/^Active profile is /{print tolower($NF); exit}')
     if [ "$current_mode" = "quiet" ]; then
       current_mode="power-saver"
     fi
     echo "$current_mode"
-  else
+    ;;
+  *)
     echo "power-saver" # fallback
-  fi
+    ;;
+  esac
 }
 
 # Set power profile
@@ -44,7 +47,7 @@ set_profile() {
 # Toggle between profiles
 toggle_profile() {
   current=$(get_current_profile)
-  case $current in
+  case "$current" in
   "power-saver")
     set_profile "balanced"
     ;;
