@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Get supported powerctl
 if command -v powerprofilesctl &>/dev/null; then
   powerctl="powerprofilesctl"
 elif command -v asusctl &>/dev/null; then
